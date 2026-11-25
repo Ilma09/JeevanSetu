@@ -25,7 +25,7 @@ Create a PostgreSQL database named `jeevansetu`. For local development, start Po
 
 ### 2. Environment
 
-Copy the root `.env.example` to `.env` and configure:
+Copy `server/.env.example` to `server/.env` and configure the database and API secrets there:
 
 ```env
 DATABASE_URL="postgresql://postgres:YOUR_PASSWORD@localhost:5432/jeevansetu?schema=public"
@@ -35,12 +35,13 @@ PORT=4000
 CLIENT_ORIGIN=http://localhost:5173
 ```
 
-Copy `server/.env.example` to `server/.env` only if running the API from the server directory separately. The API loads environment variables from its working directory. The simplest setup is to place a configured `.env` file in `server/` (and keep root `.env` for Vite's `VITE_API_URL`).
+Copy the root `.env.example` to root `.env` for the Vite frontend:
 
-Root `.env`:
 ```env
 VITE_API_URL=http://localhost:4000/api
 ```
+
+The API loads `server/.env`; Vite loads the root `.env`. Never commit real secrets or database credentials.
 
 Never commit real secrets or database credentials.
 
@@ -51,9 +52,9 @@ From the repository root:
 ```bash
 npm install
 npm install --prefix server
-npm run db:generate
-npm run db:migrate -- --name init
-npm run db:seed
+npm run prisma:generate --prefix server
+npm run prisma:migrate --prefix server -- --name init
+npm run db:seed --prefix server
 ```
 
 ### 4. Run both applications
