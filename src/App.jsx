@@ -13,7 +13,8 @@ import Emergency from './pages/Emergency.jsx'
 import FamilyPortal from './pages/FamilyPortal.jsx'
 import Notifications from './pages/Notifications.jsx'
 import Profile from './pages/Profile.jsx'
-import AuthPage from './pages/AuthPage.jsx'\nimport AdminSchemes from './pages/AdminSchemes.jsx'
+import AuthPage from './pages/AuthPage.jsx'
+import AdminSchemes from './pages/AdminSchemes.jsx'
 
 export default function App() {
   return <div className="flex min-h-screen bg-canvas">
