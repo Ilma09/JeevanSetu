@@ -16,6 +16,6 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npm install --prefix server
-      - run: npx prisma generate --schema server/prisma/schema.prisma
+      - run: npm run prisma:generate --prefix server
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/jeevansetu
