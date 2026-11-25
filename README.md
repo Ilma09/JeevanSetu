@@ -1,78 +1,100 @@
-## Contributors
+# JeevanSetu — Healthcare Assistance & Government Scheme Navigator
 
-Anchal - Development / Project Contribution
-# JeevanSetu — AI-Enabled Healthcare Assistance Platform & Government Scheme Navigator
+JeevanSetu is a React + Vite frontend with a Node.js/Express + PostgreSQL/Prisma API. The existing interface is retained while the Government Scheme Navigator, account registration/login, saved schemes, application tracking, and scheme administration are connected to database-backed APIs.
 
-JeevanSetu ("bridge to life") is a responsive React + Vite frontend that brings together
-AI-guided health support, discovery of nearby care, government health scheme matching,
-blood donation coordination, health camp alerts, emergency SOS and a family health
-record portal — designed for citizens across urban and rural India, in their own
-language.
+## Current implementation status
 
-Built as a final-year major-project frontend. All data is realistic mock data (see
-`src/data/mockData.js`); there is no backend in this repo — it's structured so a
-FastAPI/Node + PostgreSQL backend (or the ABDM sandbox APIs) can be dropped in behind
-each page without restructuring the UI.
+- Government Scheme Navigator: reads verified scheme records from PostgreSQL, with search and category filtering.
+- Accounts: registration, login, JWT authentication, bcrypt password hashing, and account profile endpoint.
+- Saved schemes and application trackers: authenticated API endpoints and profile display.
+- Scheme administration: create, edit, activate/deactivate, and verify endpoints; basic admin screen at `/admin/schemes`.
+- Seeded records: PM-JAY, PMSBY, and PMMVY, with official source URLs. Re-check each official source before relying on current terms.
+- Other healthcare modules (nearby hospital capacity/wait times, blood requests, camps, family health records, AI chat and notifications) still need authorized live data integrations. They must not be interpreted as live data; some existing frontend pages still contain prototype data and are being migrated separately.
 
-## Modules
+## Requirements
 
-- **AI Health Assistant** — chat-based symptom triage and guidance, voice-first input,
-  multilingual, with contextual suggestions into other modules.
-- **Nearby Healthcare Discovery** — hospitals, PHCs and pharmacies with live bed/wait
-  data, filters and a map placeholder.
-- **Government Scheme Navigator** — schemes matched to the citizen's profile with
-  eligibility, required documents and match score.
-- **BloodConnect** — live blood requests by urgency and blood group, donor stats and a
-  donor registration flow.
-- **Health Camp Alerts** — upcoming free screening/immunisation camps with
-  registration.
-- **Emergency Assistance** — one-tap SOS with simulated ambulance dispatch and
-  emergency contacts.
-- **Family Health Portal** — manage records for every household member.
-- **Notifications** — unified feed across all modules.
-- **Profile** — ABHA-linked identity, enrolled schemes, language/voice/notification
-  settings.
+- Node.js 20+
+- PostgreSQL 14+
+- npm
 
-## Tech stack
+## Setup
 
-- React 18 + Vite 5
-- React Router v6
-- Tailwind CSS 3
-- lucide-react icons
+### 1. Database
 
-## Getting started
+Create a PostgreSQL database named `jeevansetu`. For local development, start PostgreSQL and ensure the database user/password match the connection string.
+
+### 2. Environment
+
+Copy the root `.env.example` to `.env` and configure:
+
+```env
+DATABASE_URL="postgresql://postgres:YOUR_PASSWORD@localhost:5432/jeevansetu?schema=public"
+JWT_SECRET="use-a-long-random-secret-of-at-least-32-characters"
+JWT_EXPIRES_IN=1d
+PORT=4000
+CLIENT_ORIGIN=http://localhost:5173
+```
+
+Copy `server/.env.example` to `server/.env` only if running the API from the server directory separately. The API loads environment variables from its working directory. The simplest setup is to place a configured `.env` file in `server/` (and keep root `.env` for Vite's `VITE_API_URL`).
+
+Root `.env`:
+```env
+VITE_API_URL=http://localhost:4000/api
+```
+
+Never commit real secrets or database credentials.
+
+### 3. Install, migrate, seed
+
+From the repository root:
 
 ```bash
 npm install
-npm run dev
+npm install --prefix server
+npm run db:generate
+npm run db:migrate -- --name init
+npm run db:seed
 ```
 
-The app runs at `http://localhost:5173`.
+### 4. Run both applications
 
-To build for production:
-
+Terminal 1 (API):
 ```bash
-npm run build
-npm run preview
+npm run dev:api
+``
+
+Terminal 2 (React):
+```bash
+npm run dev
+``
+
+- Frontend: http://localhost:5173
+- API health: http://localhost:4000/api/health
+
+## First administrator
+
+Register a normal account through `/login`, then promote that account manually using PostgreSQL:
+
+```sql
+UPDATE "User" SET role = 'ADMIN' WHERE email = 'your-admin-email@example.com';
 ```
 
-## Project structure
+Sign out and sign in again to refresh the JWT role claim. Open `/admin/schemes`. New scheme records are unverified until an administrator checks the source and explicitly verifies them.
 
-```
-src/
-  components/
-    layout/      Sidebar, Topbar, MobileNav
-    common/      StatCard, Badge, SectionHeader
-  context/       AppContext — language, voice mode, notifications
-  data/          mockData.js, navConfig.js
-  pages/         one file per module (Dashboard, AIAssistant, NearbyCare, ...)
-```
+## API overview
 
-## Notes for evaluation
+- `GET /api/health`
+- `POST /api/auth/register`, `POST /api/auth/login`, `GET /api/auth/me`
+- `GET /api/schemes?q=&category=&state=&verified=true`
+- `GET /api/schemes/:id-or-slug`
+- Authenticated: `GET /api/schemes/user/saved`, `POST|DELETE /api/schemes/:id/save`
+- Authenticated: `GET /api/schemes/user/applications`, `POST /api/schemes/:id/applications`, `PATCH /api/schemes/applications/:applicationId`
+- Admin: `POST /api/schemes`, `PATCH /api/schemes/:id/admin`, `POST /api/schemes/:id/verify`
 
-- All interactions (chat, donor registration, camp registration, SOS, notifications,
-  toggles) are fully wired to React state — nothing is a static screenshot.
-- Color system, typography and layout are documented as design tokens in
-  `tailwind.config.js`.
-- Swap `src/data/mockData.js` for real API calls to move this from prototype to
-  production without touching page layouts.
+Creating an application tracker in JeevanSetu does not submit a form to a government department. Users must use the official scheme portal linked on each scheme record.
+
+## Data-source policy
+
+The myScheme portal is an official Government of India scheme discovery platform. No public, documented myScheme API was confirmed as part of this implementation; therefore the initial seed is a small curated set with official source URLs, not a claimed real-time sync. See [myScheme](https://www.myscheme.gov.in/), [National Health Authority](https://nha.gov.in/), [Department of Financial Services — PMSBY](https://financialservices.gov.in/pmsby), and [Ministry of Women and Child Development — PMMVY](https://www.wcd.gov.in/offerings/pradhan-mantri-matru-vandana-yojana).
+
+Do not add invented eligibility rules, benefits, hospital bed availability, wait times, blood requests, or camp listings. A government source link and verification timestamp are stored with every scheme record; administrators are responsible for rechecking the source before marking a record verified.
