@@ -33,7 +33,8 @@ export default function App() {
           <Route path="/family" element={<FamilyPortal />} />
           <Route path="/notifications" element={<Notifications />} />
           <Route path="/profile" element={<Profile />} />
-          <Route path="/login" element={<AuthPage />} />\n          <Route path="/admin/schemes" element={<AdminSchemes />} />
+          <Route path="/login" element={<AuthPage />} />
+          <Route path="/admin/schemes" element={<AdminSchemes />} />
         </Routes>
       </main>
       <MobileNav />
