@@ -13,7 +13,7 @@ import Emergency from './pages/Emergency.jsx'
 import FamilyPortal from './pages/FamilyPortal.jsx'
 import Notifications from './pages/Notifications.jsx'
 import Profile from './pages/Profile.jsx'
-import AuthPage from './pages/AuthPage.jsx'
+import AuthPage from './pages/AuthPage.jsx'\nimport AdminSchemes from './pages/AdminSchemes.jsx'
 
 export default function App() {
   return <div className="flex min-h-screen bg-canvas">
@@ -32,7 +32,7 @@ export default function App() {
           <Route path="/family" element={<FamilyPortal />} />
           <Route path="/notifications" element={<Notifications />} />
           <Route path="/profile" element={<Profile />} />
-          <Route path="/login" element={<AuthPage />} />
+          <Route path="/login" element={<AuthPage />} />\n          <Route path="/admin/schemes" element={<AdminSchemes />} />
         </Routes>
       </main>
       <MobileNav />
