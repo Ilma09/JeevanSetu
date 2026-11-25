@@ -23,18 +23,25 @@ router.get('/', async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
+router.get('/user/saved', requireAuth, async (req, res, next) => {
+  try {
+    const saved = await prisma.savedScheme.findMany({ where: { userId: req.auth.sub }, include: { scheme: true }, orderBy: { createdAt: 'desc' } });
+    res.json({ schemes: saved.map(item => item.scheme) });
+  } catch (error) { next(error); }
+});
+
+router.get('/user/applications', requireAuth, async (req, res, next) => {
+  try {
+    const applications = await prisma.schemeApplication.findMany({ where: { userId: req.auth.sub }, include: { scheme: true }, orderBy: { updatedAt: 'desc' } });
+    res.json({ applications });
+  } catch (error) { next(error); }
+});
+
 router.get('/:id', param('id').trim().notEmpty(), validate, async (req, res, next) => {
   try {
     const scheme = await prisma.scheme.findFirst({ where: { OR: [{ id: req.params.id }, { slug: req.params.id }], isActive: true } });
     if (!scheme) return res.status(404).json({ error: 'Scheme not found.' });
     res.json({ scheme });
-  } catch (error) { next(error); }
-});
-
-router.get('/user/saved', requireAuth, async (req, res, next) => {
-  try {
-    const saved = await prisma.savedScheme.findMany({ where: { userId: req.auth.sub }, include: { scheme: true }, orderBy: { createdAt: 'desc' } });
-    res.json({ schemes: saved.map(item => item.scheme) });
   } catch (error) { next(error); }
 });
 
@@ -53,13 +60,6 @@ router.delete('/:id/save', requireAuth, async (req, res, next) => {
     if (!scheme) return res.status(404).json({ error: 'Scheme not found.' });
     await prisma.savedScheme.deleteMany({ where: { userId: req.auth.sub, schemeId: scheme.id } });
     res.json({ message: 'Scheme removed from saved list.' });
-  } catch (error) { next(error); }
-});
-
-router.get('/user/applications', requireAuth, async (req, res, next) => {
-  try {
-    const applications = await prisma.schemeApplication.findMany({ where: { userId: req.auth.sub }, include: { scheme: true }, orderBy: { updatedAt: 'desc' } });
-    res.json({ applications });
   } catch (error) { next(error); }
 });
 
