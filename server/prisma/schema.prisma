@@ -1,0 +1,89 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum ApplicationStatus {
+  DRAFT
+  SUBMITTED
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+  WITHDRAWN
+}
+
+model User {
+  id           String        @id @default(cuid())
+  name         String
+  email        String        @unique
+  passwordHash String
+  phone        String?
+  state        String?
+  district     String?
+  role         UserRole      @default(USER)
+  savedSchemes SavedScheme[]
+  applications SchemeApplication[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model Scheme {
+  id                String        @id @default(cuid())
+  slug              String        @unique
+  name              String
+  authority         String
+  category          String
+  summary           String
+  benefits          String
+  eligibility       Json
+  documents         Json
+  officialUrl       String
+  sourceUrl         String
+  sourceName        String
+  verifiedAt        DateTime
+  isVerified        Boolean       @default(false)
+  isActive          Boolean       @default(true)
+  state             String?
+  savedBy           SavedScheme[]
+  applications      SchemeApplication[]
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  @@index([category, isActive])
+  @@index([name])
+}
+
+model SavedScheme {
+  id        String   @id @default(cuid())
+  userId    String
+  schemeId  String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  scheme    Scheme   @relation(fields: [schemeId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, schemeId])
+}
+
+model SchemeApplication {
+  id          String            @id @default(cuid())
+  userId      String
+  schemeId    String
+  status      ApplicationStatus @default(DRAFT)
+  notes       String?
+  referenceNo String?           @unique
+  user        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  scheme      Scheme            @relation(fields: [schemeId], references: [id], onDelete: Restrict)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  @@index([userId, status])
+}
