@@ -51,14 +51,14 @@ const schemes = [
     summary: 'A maternity benefit scheme providing conditional cash assistance through Direct Benefit Transfer to eligible pregnant women and lactating mothers.',
     benefits: '₹5,000 for the first living child in two instalments; ₹6,000 for the second child if the second child is a girl, subject to scheme conditions and required health-service milestones.',
     eligibility: [
-      'Pregnant women and lactating mothers meeting the scheme rules and belonging to an eligible disadvantaged category.',
+      'Pregnant women and lactating mothers aged 18 years 7 months to 55 years at childbirth, meeting scheme rules and belonging to an eligible disadvantaged category.',
       'Published eligible categories include SC/ST, BPL ration-card holders, persons with specified disability, PM-JAY beneficiaries, e-Shram card holders, MGNREGA job-card holders, eligible women farmers, NFSA ration-card holders, and women with net family income below ₹8 lakh per annum.',
       'Second-child benefit is applicable only when the second child is a girl and prescribed conditions are met.',
       'Government/PSU employees and those receiving similar maternity benefits are excluded as specified in scheme rules.'
     ],
     documents: ['Beneficiary Aadhaar details as required by the portal', 'Bank or post-office account details', 'Pregnancy and antenatal-care records', 'Birth registration and immunisation records where applicable', 'Proof of an eligible category'],
     officialUrl: 'https://pmmvy.wcd.gov.in/',
-    sourceUrl: 'https://www.wcd.gov.in/public/women/pradhan-mantri-matru-vandana-yojna',
+    sourceUrl: 'https://www.wcd.gov.in/offerings/pradhan-mantri-matru-vandana-yojana',
     sourceName: 'Ministry of Women and Child Development',
     verifiedAt: new Date('2026-11-25T00:00:00.000Z'),
     isVerified: true
